@@ -1,8 +1,8 @@
 {
-    "sourceAccountUrl": "https://dev.azure.com/malteheuermann/",
-    "sourceAccountToken": "bfrlzckqs2qzr3sxwzxca5uhkjyms5h4jugdwtan7nrdbazw73tq",
-    "targetAccountUrl": "https://dev.azure.com/malteheuermann0530/",
-    "targetAccountToken": "weqdlqszlnmlrkumc25jaianxntkuzm2aigijlgfrjmb7wdue4dq",
+    "sourceAccountUrl": "",
+    "sourceAccountToken": "",
+    "targetAccountUrl": "",
+    "targetAccountToken": "",
     "sourceProcessName": "NewWayOfAgile",
     "targetProcessName<Optional>": "NNewWayOfAgileExtension",
     "options": {
