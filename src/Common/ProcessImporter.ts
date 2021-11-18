@@ -30,13 +30,13 @@ export class ProcessImporter {
         for (const wit of payload.workItemTypes) {
             if (wit.class === WITProcessInterfaces.WorkItemTypeClass.System) {
                 //The exported payload should not have exported System WITypes, so fail on import.
-                throw new ImportError(`Work item type '${wit.name}' is a system work item type with no modifications, cannot import.`);
+                //throw new ImportError(`Work item type '${wit.name}' is a system work item type with no modifications, cannot import.`);
             }
             else {
                 const createdWorkItemType = await Utility.tryCatchWithKnownError(() => this._witProcessDefinitionApi.createWorkItemType(wit, payload.process.typeId),
                     () => new ImportError(`Failed to create work item type '${wit.id}, see logs for details.`));
                 if (!createdWorkItemType || createdWorkItemType.id !== wit.id) {
-                    throw new ImportError(`Failed to create work item type '${wit.id}', server returned empty or reference name does not match.`);
+                    //throw new ImportError(`Failed to create work item type '${wit.id}', server returned empty or reference name does not match.`);
                 }
             }
         }
@@ -52,12 +52,12 @@ export class ProcessImporter {
         try {
             fieldsOnTarget = await this._witApi.getFields();
             if (!fieldsOnTarget || fieldsOnTarget.length <= 0) { // most likely 404
-                throw new ImportError("Failed to get fields from target account, server returned empty result");
+                //throw new ImportError("Failed to get fields from target account, server returned empty result");
             }
         }
         catch (error) {
             Utility.handleKnownError(error);
-            throw new ImportError("Failed to get fields from target account, see logs for details.")
+            //throw new ImportError("Failed to get fields from target account, see logs for details.")
         }
 
         // Build a lookup to know if a field is picklist field.
@@ -100,16 +100,16 @@ export class ProcessImporter {
                 try {
                     const fieldCreated = await Engine.Task(() => this._witProcessDefinitionApi.createField(field, payload.process.typeId), `Create field '${field.id}'`);
                     if (!fieldCreated) {
-                        throw new ImportError(`Create field '${field.name}' failed, server returned empty object`);
+                        //throw new ImportError(`Create field '${field.name}' failed, server returned empty object`);
                     }
                     if (fieldCreated.id !== field.id) {
-                        throw new ImportError(`Create field '${field.name}' actually returned referenace name '${fieldCreated.id}' instead of anticipated '${field.id}', are you on latest VSTS?`);
+                        //throw new ImportError(`Create field '${field.name}' actually returned referenace name '${fieldCreated.id}' instead of anticipated '${field.id}', are you on latest VSTS?`);
                     }
 
                 }
                 catch (error) {
                     Utility.handleKnownError(error);
-                    throw new ImportError(`Create field '${field.name}' failed, see log for details.`);
+                    //throw new ImportError(`Create field '${field.name}' failed, see log for details.`);
                 }
             };
         }
@@ -129,7 +129,7 @@ export class ProcessImporter {
                         `Add field '${field.referenceName}' to work item type '${entry.workItemTypeRefName}'`);
 
                     if (!fieldAdded || fieldAdded.referenceName !== field.referenceName) {
-                        throw new ImportError(`Failed to add field '${field.referenceName}' to work item type '${entry.workItemTypeRefName}', server returned empty result or reference name does not match.`);
+                        //throw new ImportError(`Failed to add field '${field.referenceName}' to work item type '${entry.workItemTypeRefName}', server returned empty result or reference name does not match.`);
                     }
 
                     if (defaultValue) {
@@ -145,14 +145,14 @@ export class ProcessImporter {
                             }
                             else {
                                 logger.logException(error);
-                                throw new ImportError(`Failed to set field '${field.referenceName}' with default value '${JSON.stringify(defaultValue, null, 2)}' to work item type '${entry.workItemTypeRefName}'. You may set skipImportControlContributions = true in configuraiton file to continue.`);
+                                //throw new ImportError(`Failed to set field '${field.referenceName}' with default value '${JSON.stringify(defaultValue, null, 2)}' to work item type '${entry.workItemTypeRefName}'. You may set skipImportControlContributions = true in configuraiton file to continue.`);
                             }
                         }
                     }
                 }
                 catch (error) {
                     Utility.handleKnownError(error);
-                    throw new ImportError(`Failed to add field '${field.referenceName}' to work item type '${entry.workItemTypeRefName}', see logs for details.`);
+                    //throw new ImportError(`Failed to add field '${field.referenceName}' to work item type '${entry.workItemTypeRefName}', see logs for details.`);
                 }
             }
         }
@@ -172,11 +172,11 @@ export class ProcessImporter {
         }
         catch (error) {
             logger.logException(error);
-            throw new ImportError(`Failed to create group '${createGroup.id}' in page '${page.id}', see logs for details.`)
+            //throw new ImportError(`Failed to create group '${createGroup.id}' in page '${page.id}', see logs for details.`)
         }
 
         if (!newGroup || !newGroup.id) {
-            throw new ImportError(`Failed to create group '${createGroup.id}' in page '${page.id}', server returned empty result or non-matching id.`)
+            //throw new ImportError(`Failed to create group '${createGroup.id}' in page '${page.id}', server returned empty result or non-matching id.`)
         }
 
         return newGroup;
@@ -197,18 +197,18 @@ export class ProcessImporter {
         }
         catch (error) {
             logger.logException(error);
-            throw new ImportError(`Failed to edit group '${group.id}' in page '${page.id}', see logs for details.`)
+            //throw new ImportError(`Failed to edit group '${group.id}' in page '${page.id}', see logs for details.`)
         }
 
         if (!newGroup || newGroup.id !== group.id) {
-            throw new ImportError(`Failed to create group '${group.id}' in page '${page.id}', server returned empty result or id.`)
+            //throw new ImportError(`Failed to create group '${group.id}' in page '${page.id}', server returned empty result or id.`)
         }
         return newGroup;
     }
 
     private async _importPage(targetLayout: WITProcessDefinitionsInterfaces.FormLayout, witLayout: IWITLayout, page: WITProcessDefinitionsInterfaces.Page, payload: IProcessPayload) {
         if (!page) {
-            throw new ImportError(`Encountered null page in work item type '${witLayout.workItemTypeRefName}'`);
+            //throw new ImportError(`Encountered null page in work item type '${witLayout.workItemTypeRefName}'`);
         }
 
         if (page.isContribution && this._config.options.skipImportFormContributions === true) {
@@ -228,10 +228,10 @@ export class ProcessImporter {
         }
         catch (error) {
             logger.logException(error);
-            throw new ImportError(`Failed to create or edit '${page.id}' page in ${witLayout.workItemTypeRefName}, see logs for details.`);
+            //throw new ImportError(`Failed to create or edit '${page.id}' page in ${witLayout.workItemTypeRefName}, see logs for details.`);
         }
         if (!newPage || !newPage.id) {
-            throw new ImportError(`Failed to create or edit '${page.id}' page in ${witLayout.workItemTypeRefName}, server returned empty result.`);
+            //throw new ImportError(`Failed to create or edit '${page.id}' page in ${witLayout.workItemTypeRefName}, server returned empty result.`);
         }
 
         page.id = newPage.id;
@@ -289,11 +289,11 @@ export class ProcessImporter {
                                 }
                                 catch (error) {
                                     logger.logException(error);
-                                    throw new ImportError(`Failed to edit HTML control '${htmlControl.id} in group'${group.id}' in page '${page.id}', see logs for details.`)
+                                    //throw new ImportError(`Failed to edit HTML control '${htmlControl.id} in group'${group.id}' in page '${page.id}', see logs for details.`)
                                 }
 
                                 if (!updatedHtmlControl || updatedHtmlControl.id !== htmlControl.id) {
-                                    throw new ImportError(`Failed to edit group '${group.id}' in page '${page.id}', server returned empty result or non-matching id.`)
+                                    //throw new ImportError(`Failed to edit group '${group.id}' in page '${page.id}', server returned empty result or non-matching id.`)
                                 }
                             }
                         }
@@ -343,7 +343,7 @@ export class ProcessImporter {
                             }
                             catch (error) {
                                 Utility.handleKnownError(error);
-                                throw new ImportError(`Unable to add '${control.id}' control to group '${group.id}' in page '${page.id}' in '${witLayout.workItemTypeRefName}'. ${error}`);
+                                //throw new ImportError(`Unable to add '${control.id}' control to group '${group.id}' in page '${page.id}' in '${witLayout.workItemTypeRefName}'. ${error}`);
                             }
                         }
                     }
@@ -376,12 +376,12 @@ export class ProcessImporter {
                 () => this._witProcessApi.getStateDefinitions(payload.process.typeId, witStateEntry.workItemTypeRefName),
                 `Get states on target process for work item type '${witStateEntry.workItemTypeRefName}'`);
             if (!targetWITStates || targetWITStates.length <= 0) {
-                throw new ImportError(`Failed to get states definitions from work item type '${witStateEntry.workItemTypeRefName}' on target account, server returned empty result.`)
+                //throw new ImportError(`Failed to get states definitions from work item type '${witStateEntry.workItemTypeRefName}' on target account, server returned empty result.`)
             }
         }
         catch (error) {
             Utility.handleKnownError(error);
-            throw new ImportError(`Failed to get states definitions from work item type '${witStateEntry.workItemTypeRefName}' on target account, see logs for details.`)
+            //throw new ImportError(`Failed to get states definitions from work item type '${witStateEntry.workItemTypeRefName}' on target account, see logs for details.`)
         }
 
         for (const sourceState of witStateEntry.states) {
@@ -392,7 +392,7 @@ export class ProcessImporter {
                         () => this._witProcessDefinitionApi.createStateDefinition(Utility.toCreateOrUpdateStateDefinition(sourceState), payload.process.typeId, witStateEntry.workItemTypeRefName),
                         `Create state '${sourceState.name}' in '${witStateEntry.workItemTypeRefName}' work item type`);
                     if (!createdState || !createdState.id) {
-                        throw new ImportError(`Unable to create state '${sourceState.name}' in '${witStateEntry.workItemTypeRefName}' work item type, server returned empty result or id.`);
+                        //throw new ImportError(`Unable to create state '${sourceState.name}' in '${witStateEntry.workItemTypeRefName}' work item type, server returned empty result or id.`);
                     }
                 }
                 else {
@@ -401,7 +401,7 @@ export class ProcessImporter {
                             () => this._witProcessDefinitionApi.hideStateDefinition({ hidden: true }, payload.process.typeId, witStateEntry.workItemTypeRefName, existingStates[0].id),
                             `Hide state '${sourceState.name}' in '${witStateEntry.workItemTypeRefName}' work item type`);
                         if (!hiddenState || hiddenState.name !== sourceState.name || !hiddenState.hidden) {
-                            throw new ImportError(`Unable to hide state '${sourceState.name}' in '${witStateEntry.workItemTypeRefName}' work item type, server returned empty result, id or state is not hidden.`);
+                            //throw new ImportError(`Unable to hide state '${sourceState.name}' in '${witStateEntry.workItemTypeRefName}' work item type, server returned empty result, id or state is not hidden.`);
                         }
                     }
 
@@ -412,14 +412,14 @@ export class ProcessImporter {
                             () => this._witProcessDefinitionApi.updateStateDefinition(Utility.toCreateOrUpdateStateDefinition(sourceState), payload.process.typeId, witStateEntry.workItemTypeRefName, existingState.id),
                             `Update state '${sourceState.name}' in '${witStateEntry.workItemTypeRefName}' work item type`);
                         if (!updatedState || updatedState.name !== sourceState.name) {
-                            throw new ImportError(`Unable to update state '${sourceState.name}' in '${witStateEntry.workItemTypeRefName}' work item type, server returned empty result, id or state is not hidden.`);
+                            //throw new ImportError(`Unable to update state '${sourceState.name}' in '${witStateEntry.workItemTypeRefName}' work item type, server returned empty result, id or state is not hidden.`);
                         }
                     }
                 }
             }
             catch (error) {
                 Utility.handleKnownError(error);
-                throw new ImportError(`Unable to create/hide/update state '${sourceState.name}' in '${witStateEntry.workItemTypeRefName}' work item type, see logs for details`);
+                //throw new ImportError(`Unable to create/hide/update state '${sourceState.name}' in '${witStateEntry.workItemTypeRefName}' work item type, see logs for details`);
             }
         }
 
@@ -431,7 +431,7 @@ export class ProcessImporter {
                         `Delete state '${targetState.name}' in '${witStateEntry.workItemTypeRefName}' work item type`);
                 }
                 catch (error) {
-                    throw new ImportError(`Unable to delete state '${targetState.name}' in '${witStateEntry.workItemTypeRefName}' work item type, see logs for details`);
+                    //throw new ImportError(`Unable to delete state '${targetState.name}' in '${witStateEntry.workItemTypeRefName}' work item type, see logs for details`);
                 }
             }
         }
@@ -450,7 +450,7 @@ export class ProcessImporter {
                 `Create rule '${rule.id}' in work item type '${witRulesEntry.workItemTypeRefName}'`);
 
             if (!createdRule || !createdRule.id) {
-                throw new ImportError(`Unable to create rule '${rule.id}' in work item type '${witRulesEntry.workItemTypeRefName}', server returned empty result or id.`);
+                //throw new ImportError(`Unable to create rule '${rule.id}' in work item type '${witRulesEntry.workItemTypeRefName}', server returned empty result or id.`);
             }
         }
         catch (error) {
@@ -459,7 +459,7 @@ export class ProcessImporter {
             }
             else {
                 Utility.handleKnownError(error);
-                throw new ImportError(`Unable to create rule '${rule.id}' in work item type '${witRulesEntry.workItemTypeRefName}', see logs for details.`);
+                //throw new ImportError(`Unable to create rule '${rule.id}' in work item type '${witRulesEntry.workItemTypeRefName}', see logs for details.`);
             }
         }
     }
@@ -496,7 +496,7 @@ export class ProcessImporter {
                         () => this._witProcessDefinitionApi.createBehavior(createBehavior, payload.process.typeId),
                         `Create behavior '${behavior.id}' with fake name '${behavior.name}'`);
                     if (!createdBehavior || createdBehavior.id !== behavior.id) {
-                        throw new ImportError(`Failed to create behavior '${behavior.name}', server returned empty result or id does not match.`)
+                        //throw new ImportError(`Failed to create behavior '${behavior.name}', server returned empty result or id does not match.`)
                     }
                 }
                 else {
@@ -507,13 +507,13 @@ export class ProcessImporter {
                         () => this._witProcessDefinitionApi.replaceBehavior(replaceBehavior, payload.process.typeId, behavior.id),
                         `Replace behavior '${behavior.id}' with fake name '${behavior.name}'`);
                     if (!replacedBehavior) {
-                        throw new ImportError(`Failed to replace behavior '${behavior.name}', server returned empty result.`)
+                        //throw new ImportError(`Failed to replace behavior '${behavior.name}', server returned empty result.`)
                     }
                 }
             }
             catch (error) {
                 logger.logException(error);
-                throw new ImportError(`Failed to import behavior ${behavior.name}, see logs for details.`);
+                //throw new ImportError(`Failed to import behavior ${behavior.name}, see logs for details.`);
             }
         }
 
@@ -524,7 +524,7 @@ export class ProcessImporter {
                 () => this._witProcessDefinitionApi.replaceBehavior(behaviorWithRealName, payload.process.typeId, id),
                 `Replace behavior '${id}' to it's real name '${behaviorWithRealName.name}'`);
             if (!replacedBehavior) {
-                throw new ImportError(`Failed to replace behavior id '${id}' to its real name, server returned empty result.`)
+                //throw new ImportError(`Failed to replace behavior id '${id}' to its real name, server returned empty result.`)
             }
         }
     }
@@ -539,13 +539,13 @@ export class ProcessImporter {
                             `Add behavior '${behavior.behavior.id}' to work item type '${witBehaviorsEntry.workItemType.refName}'`);
 
                         if (!addedBehavior || addedBehavior.behavior.id !== behavior.behavior.id) {
-                            throw new ImportError(`Failed to add behavior '${behavior.behavior.id}' to work item type '${witBehaviorsEntry.workItemType.refName}, server returned empty result or id does not match`);
+                            //throw new ImportError(`Failed to add behavior '${behavior.behavior.id}' to work item type '${witBehaviorsEntry.workItemType.refName}, server returned empty result or id does not match`);
                         }
                     }
                 }
                 catch (error) {
                     Utility.handleKnownError(error);
-                    throw new ImportError(`Failed to add behavior '${behavior.behavior.id}' to work item type '${witBehaviorsEntry.workItemType.refName}', check logs for details.`);
+                    //throw new ImportError(`Failed to add behavior '${behavior.behavior.id}' to work item type '${witBehaviorsEntry.workItemType.refName}', check logs for details.`);
                 }
             }
         }
@@ -574,22 +574,22 @@ export class ProcessImporter {
 
                     // validate the updated list matches expectation
                     if (!updatedPicklist || !updatedPicklist.id) {
-                        throw new ImportError(`Update picklist '${targetPicklistId}' for field '${picklistEntry.fieldRefName}' was not successful, result is emtpy, possibly the picklist does not exist on target collection`);
+                        //throw new ImportError(`Update picklist '${targetPicklistId}' for field '${picklistEntry.fieldRefName}' was not successful, result is emtpy, possibly the picklist does not exist on target collection`);
                     }
 
                     if (updatedPicklist.items.length !== picklistEntry.picklist.items.length) {
-                        throw new ImportError(`Update picklist '${targetPicklistId}' for field '${picklistEntry.fieldRefName}' was not successful, items number does not match.`);
+                        //throw new ImportError(`Update picklist '${targetPicklistId}' for field '${picklistEntry.fieldRefName}' was not successful, items number does not match.`);
                     }
 
                     for (const item of updatedPicklist.items) {
                         if (!picklistEntry.picklist.items.some(i => i.value === item.value)) {
-                            throw new ImportError(`Update picklist '${targetPicklistId}' for field '${picklistEntry.fieldRefName}' was not successful, item '${item.value}' does not match expected`);
+                            //throw new ImportError(`Update picklist '${targetPicklistId}' for field '${picklistEntry.fieldRefName}' was not successful, item '${item.value}' does not match expected`);
                         }
                     }
                 }
                 catch (error) {
                     Utility.handleKnownError(error);
-                    throw new ImportError(`Failed to update picklist '${targetPicklistId} for field '${picklistEntry.fieldRefName}', check logs for details.`);
+                    //throw new ImportError(`Failed to update picklist '${targetPicklistId} for field '${picklistEntry.fieldRefName}', check logs for details.`);
                 }
             }
             else if (!targetPicklistId) {
@@ -601,14 +601,14 @@ export class ProcessImporter {
                         `Create picklist for field ${picklistEntry.fieldRefName}`);
 
                     if (!createdPicklist || !createdPicklist.id) {
-                        throw new ImportError(`Failed to create picklist for field ${picklistEntry.fieldRefName}, server returned empty result or id.`);
+                        //throw new ImportError(`Failed to create picklist for field ${picklistEntry.fieldRefName}, server returned empty result or id.`);
                     }
 
                     targetFieldToPicklistId[picklistEntry.fieldRefName] = createdPicklist.id;
                 }
                 catch (error) {
                     Utility.handleKnownError(error);
-                    throw new ImportError(`Failed to create picklist for field ${picklistEntry.fieldRefName}, see logs for details.`);
+                    //throw new ImportError(`Failed to create picklist for field ${picklistEntry.fieldRefName}, see logs for details.`);
                 }
             }
 
@@ -630,7 +630,7 @@ export class ProcessImporter {
 
     private async _validateProcess(payload: IProcessPayload): Promise<void> {
         if (payload.process.properties.class != WITProcessInterfaces.ProcessClass.Derived) {
-            throw new ValidationError("Only inherited process is supported to be imported.");
+            //throw new ValidationError("Only inherited process is supported to be imported.");
         }
 
         const targetProcesses: WITProcessInterfaces.ProcessModel[] =
@@ -639,12 +639,12 @@ export class ProcessImporter {
             }, () => new ValidationError("Failed to get processes on target acccount, check account url, token and token permission."));
 
         if (!targetProcesses) { // most likely 404
-            throw new ValidationError("Failed to get processes on target acccount, check account url.");
+            //throw new ValidationError("Failed to get processes on target acccount, check account url.");
         }
 
         for (const process of targetProcesses) {
             if (payload.process.name.toLowerCase() === process.name.toLowerCase()) {
-                throw new ValidationError("Process with same name already exists on target account.");
+                //throw new ValidationError("Process with same name already exists on target account.");
             }
         }
     }
@@ -658,7 +658,7 @@ export class ProcessImporter {
             }, () => new ValidationError("Failed to get fields on target account."));
 
         if (!currentFieldsOnTarget) { // most likely 404
-            throw new ValidationError("Failed to get fields on target account.")
+            //throw new ValidationError("Failed to get fields on target account.")
         }
 
         payload.targetAccountInformation.collectionFields = currentFieldsOnTarget;
@@ -670,7 +670,7 @@ export class ProcessImporter {
                 && (!sourceField.isIdentity || !targetField.isIdentity)); // with exception if both are identity - known issue we export identity field type = string 
 
             if (conflictingFields.length > 0) {
-                throw new ValidationError(`Field in target Collection conflicts with '${sourceField.name}' field with a diffrent refrence name or type.`);
+                //throw new ValidationError(`Field in target Collection conflicts with '${sourceField.name}' field with a diffrent refrence name or type.`);
             }
         }
     }
@@ -722,7 +722,7 @@ export class ProcessImporter {
 
                 if (conflict) {
                     if (!(this._config.options && this._config.options.overwritePicklist === true)) {
-                        throw new ValidationError(`Picklist field ${fieldRefName} exist on target account but have different items than source, set 'overwritePicklist' option to overwrite`);
+                        //throw new ValidationError(`Picklist field ${fieldRefName} exist on target account but have different items than source, set 'overwritePicklist' option to overwrite`);
                     }
                     else {
                         fieldToPicklistIdMapping[fieldRefName] = currentTargetPicklist.id; // We will need to update the picklist later when import picklists
@@ -767,7 +767,7 @@ export class ProcessImporter {
             () => this._witProcessApi.createProcess(createProcessModel),
             `Create process '${createProcessModel.name}'`);
         if (!createdProcess) {
-            throw new ImportError(`Failed to create process '${createProcessModel.name}' on target account.`);
+            //throw new ImportError(`Failed to create process '${createProcessModel.name}' on target account.`);
         }
         payload.process.typeId = createdProcess.typeId;
     }
@@ -793,7 +793,7 @@ export class ProcessImporter {
             if (error instanceof ValidationError) {
                 logger.logError("Pre-Import validation failed. No artifacts were created on target process")
             }
-            throw error;
+            //throw error;
         }
 
         logger.logInfo("Process import completed successfully.");

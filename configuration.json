@@ -3,8 +3,8 @@
     "sourceAccountToken": "",
     "targetAccountUrl": "",
     "targetAccountToken": "",
-    "sourceProcessName": "NewWayOfAgile",
-    "targetProcessName<Optional>": "NNewWayOfAgileExtension",
+    "sourceProcessName": "",
+    "targetProcessName<Optional>": "",
     "options": {
         "processFilename<Optional>": "Set to override default export file name, remove <Optional> from param name",
         "logLevel<Optional>":"Set to override default log level (Information), remove <Optional> from param name",
