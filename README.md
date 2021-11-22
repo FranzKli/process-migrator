@@ -19,8 +19,8 @@ NOTE: This only works with 'Inherited Process', for 'XML process' you may upload
   
 ## Contribute
 
-- From the root of source, run `npm install`
-- Build by `npm run build`
+- From the root of source, run `npm install` (Delete "package-lock.json" if it is not working)
+- Build by `npm run build` (comment out es2017 part if it is not working)
 - Execute through `node build\nodejs\nodejs\main.js <args>`
 
 ## Documentation
